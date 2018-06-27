@@ -22,11 +22,11 @@ namespace TGUI
         {
             var process = new Process();
             process.StartInfo.FileName=
-                @"C:\Users\b7306\Desktop\2A32KS古谷颯\TCompiler\TCompiler\bin\Debug\tc.exe";
+                @"..\..\..\TCompiler\bin\Debug\tc.exe";
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.CreateNoWindow = true;
-            process.StartInfo.Arguments = "-h";
+            process.StartInfo.Arguments = "-v";
             process.Start();
             var io = process.StandardOutput;
             textBox1.Text = io.ReadToEnd();

@@ -69,7 +69,34 @@ namespace TCompiler
 
         public Result<Expression,string> TopLevelParser()
         {
-            return MinusOpParser();
+            return EqualOpParser();
+        }
+
+        Result<Expression, string> EqualOpParser()
+        {
+            return MinusOpParser().Bind(expr => EqualOpParser2(expr));
+        }
+
+        Result<Expression, string> EqualOpParser2(Expression expr1)
+        {
+            var checkPoint = ts.NowIndex;
+
+            return
+                (
+                    (
+                       ts.Get("error:==?")
+                        .Bind(TokenStrEqual("==", "error:==?"))
+                        .okFlag
+                    ) ?
+                        ts.Next("==の後に式がありません")
+                        .Bind(_ => MinusOpParser())
+                        .ErrBind(_ => ErrParseResult("==の後に式がありません"))
+                        .Bind(expr2 => {
+                            return EqualOpParser2( Expression.Condition(Expression.Equal(expr1, expr2),Expression.Constant(1),Expression.Constant(0)));
+                        })
+                    :
+                        OkParseResult(expr1)
+                ).ErrBind(Rollback<Expression>(checkPoint));
         }
 
         Result<Expression, string> MinusOpParser()
@@ -84,13 +111,13 @@ namespace TCompiler
             return
                 (
                     (
-                       ts.Get("error:+ or -?")
-                        .Bind(TokenStrEqual("-", "error:+?"))
+                       ts.Get("error:-?")
+                        .Bind(TokenStrEqual("-", "error:-?"))
                         .okFlag
                     ) ?
-                        ts.Next("+の後に式がありません")
+                        ts.Next("-の後に式がありません")
                         .Bind(_ => AddOpParser())
-                        .ErrBind(_ => ErrParseResult("+の後に式がありません"))
+                        .ErrBind(_ => ErrParseResult("-の後に式がありません"))
                         .Bind(expr2 => {
                             return MinusOpParser2(Expression.Add(expr1,Expression.Negate(expr2)));
                         })
@@ -111,7 +138,7 @@ namespace TCompiler
             return
                 (
                     (
-                       ts.Get("error:+ or -?")
+                       ts.Get("error:+?")
                         .Bind(TokenStrEqual("+", "error:+?"))
                         .okFlag
                     ) ?

@@ -40,7 +40,7 @@ namespace TCompiler
 
         public void DebugPrint()
         {
-            Console.WriteLine("STR=" + str + " : Type" + tokenType.ToString());
+            Console.WriteLine("STR=[" + str + "] :" + tokenType.ToString());
         }
 
     }

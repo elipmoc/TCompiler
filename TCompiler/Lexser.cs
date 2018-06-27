@@ -15,26 +15,23 @@ namespace TCompiler
             var tokenlist = new List<Token>();
             var comment = new Regex(@"\/\*[^(\*\/)]*\*\/");
             var space = new Regex(@"^[ \t]+");
-            var num_int = new Regex(@"^\d+");
-            var character = new Regex(@"^(?:').(?:')");
-            var string_ = new Regex("^\"[^\"]*\"");
-            var symbol = new Regex(@"^((return)|(>>=)|(\.\.)|(\.)|(@)|(new)|(int)|(in)|(let)|(unit)|(void)|(string)|(double)|(bool)|(do)|(->)|(::)|(==)|(<=)|(>=)|(!=)|(\+\+)|[<>\[\]:\?\+\-%\*\/{}\(\)=,])");
-            var Identifier = new Regex(@"^([a-z]|[A-Z]|[0-9]|_)+");
+            var num = new Regex(@"^\d+");
+            var identifier = new Regex(@"^[a-z]+");
+            var symbol = new Regex(@"^(if|then|else|\(|\))");
+            var op = new Regex(@"^(\+|-|/|\*|=|==)");
             Match match;
             while (str.Length != 0)
             {
                 if ((match = space.Match(str)).Success) ;
                 else if ((match = comment.Match(str)).Success) ;
-                else if ((match = num_int.Match(str)).Success)
+                else if ((match = num.Match(str)).Success)
                     tokenlist.Add(new Token(match.Value, TokenType.Num));
-                else if ((match = character.Match(str)).Success)
-                    tokenlist.Add(new Token(match.Value, TokenType.Charcter));
-                else if ((match = string_.Match(str)).Success)
-                    tokenlist.Add(new Token(match.Value, TokenType.String));
                 else if ((match = symbol.Match(str)).Success)
-                    tokenlist.Add(new Token(match.Value, TokenType.symbol));
-                else if ((match = Identifier.Match(str)).Success)
-                    tokenlist.Add(new Token(match.Value, TokenType.Identifier));
+                    tokenlist.Add(new Token(match.Value, TokenType.Other));
+                else if ((match = identifier.Match(str)).Success)
+                    tokenlist.Add(new Token(match.Value, TokenType.Id));
+                else if ((match = op.Match(str)).Success)
+                    tokenlist.Add(new Token(match.Value, TokenType.Op));
                 else
                     return null;
                 str = str.Substring(match.Length);

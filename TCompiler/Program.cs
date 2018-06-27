@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,14 @@ namespace TCompiler
         {
             if (args.Length == 0) return;
             switch (args[0]){
+                case "-lex":
+                    var tokenStream = Lexser.Lexicalanalysis(new StreamReader(args[1]).ReadToEnd());
+                    if (tokenStream != null)
+                    {
+                        for (var i = 0; i < tokenStream.Size; i++)
+                            tokenStream[i].DebugPrint();
+                    }
+                    break;
                 case "-v":
                 case "-V":
                 case "--Version":

@@ -8,8 +8,10 @@ namespace TCompiler
 {
     class Result<T,F>
     {
-        public delegate void OkFunc(T ok);
-        public delegate void ErrFunc(F err);
+        public delegate R OkFunc<R>(T ok);
+        public delegate R ErrFunc<R>(F err);
+        public delegate void VoidOkFunc(T ok);
+        public delegate void VoidErrFunc(F err);
         public delegate Result<G, F> BindFunc<G>(T ok);
         public delegate Result<T, G> ErrBindFunc<G>(F err);
         T ok;
@@ -36,14 +38,23 @@ namespace TCompiler
             okFlag = false;
         }
 
-        public void Match(OkFunc okF,ErrFunc errF)
+        public R Match<R>(OkFunc<R> okF,ErrFunc<R> errF)
+        {
+            if (okFlag)
+                return okF(ok);
+            else
+                return errF(err);
+        }
+
+        public void VoidMatch(VoidOkFunc okF, VoidErrFunc errF)
         {
             if (okFlag)
                 okF(ok);
             else
                 errF(err);
         }
-        public void Match(OkFunc okF)
+
+        public void Match(VoidOkFunc okF)
         {
             if (okFlag)
                 okF(ok);

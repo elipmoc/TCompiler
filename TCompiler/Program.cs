@@ -31,7 +31,7 @@ namespace TCompiler
                     {
                         Lexser.Lexicalanalysis(new StreamReader(args[1]).ReadToEnd())
                             .Bind(tokenStream=> {
-                                new Parser(tokenStream).Parse().Match(
+                                new Parser(tokenStream).Parse().VoidMatch(
                                     (action) => { action(); },
                                     (errmsg) => { Console.WriteLine(errmsg); }
                                     );
@@ -67,7 +67,7 @@ namespace TCompiler
                                var typeBuilder = moduleBuilder.DefineType("Program", TypeAttributes.Class);
                                var methodBuilder = typeBuilder.DefineMethod("Main", MethodAttributes.Static);
                                methodBuilder.SetParameters(typeof(string[]));
-                               new Parser(tokenStream).Parse(methodBuilder).Match(
+                               new Parser(tokenStream).Parse(methodBuilder).VoidMatch(
                                    (_) => {
                                        typeBuilder.CreateType();
                                        assemblyBuilder.SetEntryPoint(methodBuilder);

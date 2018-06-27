@@ -11,6 +11,8 @@ namespace TCompiler
     class Parser
     {
         TokenStream ts;
+        VariableTable vt= new VariableTable();
+
         public Parser(TokenStream ts)
         {
             this.ts = ts;
@@ -54,22 +56,61 @@ namespace TCompiler
 
         public Result<Action,string> Parse()
         {
-            return TopLevelParser().Bind(expr => {
+            return TopLevelBlockParser().Bind(expr => {
                 return Result<Action,string>.Ok(Expression.Lambda<Action>(expr).Compile());
             });
         }
 
         public Result<int, string> Parse(MethodBuilder mbuilder)
         {
-            return TopLevelParser().Bind(expr => {
+            return TopLevelBlockParser().Bind(expr => {
                 Expression.Lambda<Action>(expr).CompileToMethod(mbuilder);
                 return Result<int, string>.Ok(0);
             });
         }
 
-        public Result<Expression,string> TopLevelParser()
+        Result<Expression, string> TopLevelBlockParser()
         {
-            return EqualOpParser();
+            return TopLevelParser().Bind(expr => OkParseResult(Expression.Block(vt.GetNowNestParamList(), expr)));
+        }
+
+        Result<Expression,string> TopLevelParser()
+        {
+            return AssignOpParser();
+        }
+
+        Result<Expression, string> AssignOpParser()
+        {
+            var checkPoint = ts.NowIndex;
+
+            return
+                ts.Get("error:Assign?")
+                .Bind(TokenTypeEqual(TokenType.Id, "error:Assign?"))
+                .Match<Result<Expression,string>>(
+                    token =>
+                        (
+                            ts.Next("error:=がないのでは？")
+                            .Bind(TokenStrEqual("=", "error:=がないのでは？"))
+                            .Bind(_ => ts.Next("error:=の右に式がありません"))
+                            .Match<Result<Expression,string>>(
+                                _=>(
+                                    TopLevelParser()
+                                    .Bind(expr => {
+                                        vt.Register(token.Str, Expression.Parameter(Type.GetType("System.Int32"),token.Str));
+                                        return OkParseResult(Expression.Assign(vt.FindNowNest(token.Str), expr));
+                                    })
+                                ),
+                                _=> 
+                                {
+                                    ts.Prev();
+                                    return EqualOpParser();
+                                }
+
+                            )
+                            
+                         ),
+                    _=> EqualOpParser()
+                ).ErrBind(Rollback<Expression>(checkPoint));
         }
 
         Result<Expression, string> EqualOpParser()
@@ -209,8 +250,10 @@ namespace TCompiler
 
         Result<Expression,string> TermParser()
         {
-            return NumParser()
-                .ErrBind((e)=>PrintParser());
+            return
+                PrintParser()
+                .ErrBind(e=>NumParser())
+                .ErrBind(e=>IdParser());
         }
 
         Result<Expression,string> PrintParser()
@@ -244,6 +287,17 @@ namespace TCompiler
                 ts.Next("eof");
                 return OkParseResult(Expression.Constant(token.GetNum()));
             });
+        }
+
+        Result<Expression, string> IdParser()
+        {
+            return ts.Get("error:Id?")
+             .Bind(TokenTypeEqual(TokenType.Id, "error:Id?"))
+             .Bind(token =>
+             {
+                 ts.Next("eof");
+                 return OkParseResult(vt.FindNowNest(token.Str));
+             });
         }
     }
 }

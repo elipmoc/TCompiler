@@ -14,11 +14,22 @@ namespace TCompiler
             if (args.Length == 0) return;
             switch (args[0]){
                 case "-lex":
-                    var tokenStream = Lexser.Lexicalanalysis(new StreamReader(args[1]).ReadToEnd());
-                    if (tokenStream != null)
                     {
-                        for (var i = 0; i < tokenStream.Size; i++)
-                            tokenStream[i].DebugPrint();
+                        var tokenStream = Lexser.Lexicalanalysis(new StreamReader(args[1]).ReadToEnd());
+                        if (tokenStream != null)
+                        {
+                            for (var i = 0; i < tokenStream.Size; i++)
+                                tokenStream[i].DebugPrint();
+                        }
+                    }
+                    break;
+                case "-run":
+                    {
+                        var tokenStream = Lexser.Lexicalanalysis(new StreamReader(args[1]).ReadToEnd());
+                        if (tokenStream != null)
+                        {
+                            new Parser(tokenStream).TopLevelParser()();
+                        }
                     }
                     break;
                 case "-v":

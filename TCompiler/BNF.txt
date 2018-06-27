@@ -1,0 +1,7 @@
+﻿topLevel := <addOp>
+addOp := <addOp> {('+'|'-') <addOp>}
+mulOp := <divOp> {'*' <divOp>}
+divOp := <term> {'/' <term>}
+term := '(' <topLevel> ')' | <print> | <num>+
+print := 'print(' <topLevel> ')'
+num := [0-9]

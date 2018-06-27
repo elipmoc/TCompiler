@@ -12,7 +12,12 @@ namespace TCompiler
         public int NowIndex { get; private set; }
 
         //次のトークンへインデックスを進める
-        public void Next() { NowIndex++; }
+        public Result<Token,string> Next(string errorMsg) {
+            NowIndex++;
+            if (Size <= NowIndex)
+                return Result<Token, string>.Err(errorMsg);
+            return Result<Token, string>.Ok(tokenlist[NowIndex]);
+        }
 
         //前のトークンへインデックスを戻す
         public void Prev() { NowIndex--; }
@@ -24,7 +29,11 @@ namespace TCompiler
         }
 
         //nowindexがさすトークンを得る
-        internal Token Get() { return tokenlist[NowIndex]; }
+        internal Result<Token,string> Get(string errorMsg) {
+            if (Size <= NowIndex)
+                return Result<Token, string>.Err(errorMsg);
+            return Result<Token, string>.Ok(tokenlist[NowIndex]);
+        }
 
         internal Token this[int index]
         {

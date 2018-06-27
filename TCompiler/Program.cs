@@ -27,11 +27,14 @@ namespace TCompiler
                     break;
                 case "-run":
                     {
-                        var tokenStream = Lexser.Lexicalanalysis(new StreamReader(args[1]).ReadToEnd());
-                        if (tokenStream != null)
-                        {
-                            new Parser(tokenStream).Parse()();
-                        }
+                        Lexser.Lexicalanalysis(new StreamReader(args[1]).ReadToEnd())
+                            .Bind(tokenStream=> {
+                                new Parser(tokenStream).Parse().Match(
+                                    (action) => { action(); },
+                                    (errmsg) => { Console.WriteLine(errmsg); }
+                                    );
+                                return Result<int, string>.Ok(0);
+                            });
                     }
                     break;
                 case "-v":

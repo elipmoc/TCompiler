@@ -10,9 +10,11 @@ namespace TCompiler
     {
         public delegate void OkFunc(T ok);
         public delegate void ErrFunc(F err);
+        public delegate Result<G, F> BindFunc<G>(T ok);
+        public delegate Result<T, G> ErrBindFunc<G>(F err);
         T ok;
         F err;
-        bool okFlag;
+        public readonly bool okFlag;
 
         public static Result<T,F> Err(F err)
         {
@@ -47,7 +49,19 @@ namespace TCompiler
                 okF(ok);
         }
 
-        public Result Bind()
+        public Result<G,F> Bind<G>(BindFunc<G> bindF)
+        {
+            if (okFlag) return bindF(ok);
+            else
+                return Result<G,F>.Err(err);
+        }
+
+        public Result<T, G> ErrBind<G>(ErrBindFunc<G> bindF)
+        {
+            if (okFlag==false) return bindF(err);
+            else
+                return Result<T, G>.Ok(ok);
+        }
     }
 
 }

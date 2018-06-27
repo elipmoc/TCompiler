@@ -1,7 +1,11 @@
-﻿topLevel := <addOp>
+﻿topLevel := <assignOp>
+assignOp := <id> '=' <topLevel> | <equalOp>
+equalOp := <addOp> {'==' <addOp>}
 addOp := <addOp> {('+'|'-') <addOp>}
 mulOp := <divOp> {'*' <divOp>}
 divOp := <term> {'/' <term>}
-term := '(' <topLevel> ')' | <print> | <num>+
+term := '(' <topLevel> ')' | <print> | <num> | <id> | <if>
 print := 'print(' <topLevel> ')'
-num := [0-9]
+if := 'if' <topLevel> 'then' <topLevel> 'else' <topLevel>
+num := [0-9]+
+id := [a-z]+

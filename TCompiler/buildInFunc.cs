@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TCompiler
 {
-    static class buildInFunc
+    public static class buildInFunc
     {
         public static int Print(int x)
         {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -56,7 +57,14 @@ namespace TCompiler
             return TopLevelParser().Bind(expr => {
                 return Result<Action,string>.Ok(Expression.Lambda<Action>(expr).Compile());
             });
+        }
 
+        public Result<int, string> Parse(MethodBuilder mbuilder)
+        {
+            return TopLevelParser().Bind(expr => {
+                Expression.Lambda<Action>(expr).CompileToMethod(mbuilder);
+                return Result<int, string>.Ok(0);
+            });
         }
 
         public Result<Expression,string> TopLevelParser()

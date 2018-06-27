@@ -10,7 +10,7 @@ namespace TCompiler
     class Lexser
     {
         //字句解析実行
-        static public TokenStream Lexicalanalysis(string str)
+        static public Result<TokenStream,string> Lexicalanalysis(string str)
         {
             var tokenlist = new List<Token>();
             var comment = new Regex(@"\/\*[^(\*\/)]*\*\/");
@@ -33,11 +33,11 @@ namespace TCompiler
                 else if ((match = op.Match(str)).Success)
                     tokenlist.Add(new Token(match.Value, TokenType.Op));
                 else
-                    return null;
+                    return Result<TokenStream,string>.Err("字句解析エラー");
                 str = str.Substring(match.Length);
             }
 
-            return new TokenStream(tokenlist);
+            return Result<TokenStream,string>.Ok(new TokenStream(tokenlist));
         }
     }
 }

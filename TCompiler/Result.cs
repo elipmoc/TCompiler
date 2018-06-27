@@ -41,6 +41,13 @@ namespace TCompiler
             else
                 errF(err);
         }
+        public void Match(OkFunc okF)
+        {
+            if (okFlag)
+                okF(ok);
+        }
+
+        public Result Bind()
     }
 
 }

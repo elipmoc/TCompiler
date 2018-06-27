@@ -28,7 +28,7 @@ namespace TCompiler
                         var tokenStream = Lexser.Lexicalanalysis(new StreamReader(args[1]).ReadToEnd());
                         if (tokenStream != null)
                         {
-                            new Parser(tokenStream).TopLevelParser()();
+                            new Parser(tokenStream).Parse()();
                         }
                     }
                     break;

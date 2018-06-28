@@ -72,6 +72,12 @@ namespace TCompiler
                                        typeBuilder.CreateType();
                                        assemblyBuilder.SetEntryPoint(methodBuilder);
                                        assemblyBuilder.Save(args[2]+".exe");
+                                       if(File.Exists(args[3] + "\\" + args[2] + ".exe")) File.Delete(args[3] + "\\" + args[2] + ".exe");
+                                       File.Move(args[2] + ".exe", args[3]+"\\"+args[2]+".exe");
+                                       var tcEXE=Assembly.GetExecutingAssembly().Location;
+                                       if (File.Exists(args[3] + "\\tc.exe")) File.Delete(args[3] + "\\tc.exe");
+                                       File.Copy(tcEXE, args[3] + "\\tc.exe");
+                                       Console.WriteLine("build:" + args[3]);
                                    },
                                    (errmsg) => { Console.WriteLine(errmsg); }
                                    );

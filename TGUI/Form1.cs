@@ -14,6 +14,8 @@ namespace TGUI
     public partial class Form1 : Form
     {
         string projectPath = "";
+        string projectName = "";
+        TCompilerCommand tcc = new TCompilerCommand();
 
         const string formTitle = "Micsosoft Visual Stdio";
         public Form1()
@@ -23,18 +25,8 @@ namespace TGUI
 
         private void button1_Click(object sender, EventArgs e)
         {
-            var process = new Process();
-            process.StartInfo.FileName=
-                @"..\..\..\TCompiler\bin\Debug\tc.exe";
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.CreateNoWindow = true;
-            process.StartInfo.Arguments = "-v";
-            process.Start();
-            var io = process.StandardOutput;
-            textBox1.Text = io.ReadToEnd();
-            process.WaitForExit();
-            process.Close();
+
+            textBox1.Text = tcc.GetVersion();
 
         }
 
@@ -44,6 +36,7 @@ namespace TGUI
             if (npf.ShowDialog() == DialogResult.OK) {
                 this.Text = npf.projectName + " - " + formTitle;
                 projectPath= npf.pathName + "\\" + npf.projectName;
+                projectName = npf.projectName;
                 System.IO.Directory.CreateDirectory(projectPath);
                 System.IO.File.Create(projectPath + "\\source.txt").Close();
                 fileNameLabel.Text = "source.txt";
@@ -52,13 +45,30 @@ namespace TGUI
 
         private void ファイル保存ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var bytes=System.Text.Encoding.UTF8.GetBytes(editTextBox.Text);
-            var file=System.IO.File.OpenWrite(projectPath + "\\source.txt");
+            fileSave();
+        }
+
+        private void fileSave()
+        {
+            var bytes = System.Text.Encoding.UTF8.GetBytes(editTextBox.Text);
+            var file = new System.IO.StreamWriter(projectPath + "\\source.txt");
 
             using (file)
             {
-                file.Write(bytes, 0, bytes.Length);
+                file.Write(editTextBox.Text.ToArray());
             }
+        }
+
+        private void buildButton_Click(object sender, EventArgs e)
+        {
+            fileSave();
+            textBox1.Text=tcc.Build(projectPath + "\\source.txt",projectName ,projectPath);
+        }
+
+        private void runButton_Click(object sender, EventArgs e)
+        {
+            fileSave();
+            textBox1.Text = tcc.Run(projectPath + "\\source.txt");
         }
     }
 }

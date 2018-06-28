@@ -39,12 +39,13 @@ namespace TGUI
             return p.StandardOutput.ReadToEnd()+p.StandardError.ReadToEnd();
         }
 
-        public string Run(string source)
+        public void Run(string source)
         {
-            p.StartInfo.Arguments = "-run " + source;
-            p.Start();
-            p.WaitForExit();
-            return p.StandardOutput.ReadToEnd() + p.StandardError.ReadToEnd();
+            var pp = new Process();
+            pp.StartInfo.FileName =
+                @"..\..\..\TCompiler\bin\Debug\tc.exe";
+            pp.StartInfo.Arguments = "-run " + source;
+            pp.Start();
         }
 
         public void Dispose()

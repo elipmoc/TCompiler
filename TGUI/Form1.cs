@@ -81,7 +81,8 @@ namespace TGUI
         private void runButton_Click(object sender, EventArgs e)
         {
             fileSave();
-            textBox1.Text = tcc.Run(projectPath + "\\source.txt");
+            textBox1.Text=tcc.Build(projectPath + "\\source.txt",projectName ,projectPath);
+            tcc.Run(projectPath + "\\source.txt");
         }
 
 

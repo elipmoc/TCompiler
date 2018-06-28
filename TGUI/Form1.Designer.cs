@@ -34,11 +34,12 @@
             this.ファイルToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.新規プロジェクト作成ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.プロジェクトを開くToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
-            this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
-            this.textBox2 = new System.Windows.Forms.TextBox();
             this.ファイル保存ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
+            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.menuStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -98,6 +99,7 @@
             this.新規プロジェクト作成ToolStripMenuItem.Name = "新規プロジェクト作成ToolStripMenuItem";
             this.新規プロジェクト作成ToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
             this.新規プロジェクト作成ToolStripMenuItem.Text = "新規プロジェクト作成";
+            this.新規プロジェクト作成ToolStripMenuItem.Click += new System.EventHandler(this.新規プロジェクト作成ToolStripMenuItem_Click);
             // 
             // プロジェクトを開くToolStripMenuItem
             // 
@@ -106,6 +108,14 @@
             this.プロジェクトを開くToolStripMenuItem.Name = "プロジェクトを開くToolStripMenuItem";
             this.プロジェクトを開くToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
             this.プロジェクトを開くToolStripMenuItem.Text = "プロジェクトを開く";
+            // 
+            // ファイル保存ToolStripMenuItem
+            // 
+            this.ファイル保存ToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(44)))), ((int)(((byte)(44)))));
+            this.ファイル保存ToolStripMenuItem.ForeColor = System.Drawing.SystemColors.Info;
+            this.ファイル保存ToolStripMenuItem.Name = "ファイル保存ToolStripMenuItem";
+            this.ファイル保存ToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
+            this.ファイル保存ToolStripMenuItem.Text = "ファイル保存";
             // 
             // toolStrip1
             // 
@@ -119,15 +129,6 @@
             this.toolStrip1.TabIndex = 3;
             this.toolStrip1.Text = "toolStrip1";
             // 
-            // toolStripButton1
-            // 
-            this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripButton1.ForeColor = System.Drawing.SystemColors.Info;
-            this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton1.Name = "toolStripButton1";
-            this.toolStripButton1.Size = new System.Drawing.Size(35, 22);
-            this.toolStripButton1.Text = "実行";
-            // 
             // toolStripButton2
             // 
             this.toolStripButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
@@ -136,6 +137,15 @@
             this.toolStripButton2.Name = "toolStripButton2";
             this.toolStripButton2.Size = new System.Drawing.Size(37, 22);
             this.toolStripButton2.Text = "ビルド";
+            // 
+            // toolStripButton1
+            // 
+            this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripButton1.ForeColor = System.Drawing.SystemColors.Info;
+            this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton1.Name = "toolStripButton1";
+            this.toolStripButton1.Size = new System.Drawing.Size(35, 22);
+            this.toolStripButton1.Text = "実行";
             // 
             // textBox2
             // 
@@ -150,14 +160,6 @@
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(533, 170);
             this.textBox2.TabIndex = 4;
-            // 
-            // ファイル保存ToolStripMenuItem
-            // 
-            this.ファイル保存ToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(44)))), ((int)(((byte)(44)))));
-            this.ファイル保存ToolStripMenuItem.ForeColor = System.Drawing.SystemColors.Info;
-            this.ファイル保存ToolStripMenuItem.Name = "ファイル保存ToolStripMenuItem";
-            this.ファイル保存ToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
-            this.ファイル保存ToolStripMenuItem.Text = "ファイル保存";
             // 
             // Form1
             // 
@@ -196,6 +198,7 @@
         private System.Windows.Forms.ToolStripButton toolStripButton2;
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.ToolStripMenuItem ファイル保存ToolStripMenuItem;
+        private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog;
     }
 }
 

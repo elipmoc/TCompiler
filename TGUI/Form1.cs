@@ -34,5 +34,11 @@ namespace TGUI
             process.Close();
 
         }
+
+        private void 新規プロジェクト作成ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            folderBrowserDialog.ShowDialog();
+//            folderBrowserDialog.
+        }
     }
 }

@@ -14,7 +14,7 @@ namespace TCompiler
         {
             var tokenlist = new List<Token>();
             var comment = new Regex(@"\/\*[^(\*\/)]*\*\/");
-            var space = new Regex(@"^[ \t]+");
+            var skip = new Regex(@"^[ \t\n\r]+");
             var num = new Regex(@"^\d+");
             var identifier = new Regex(@"^[a-z]+");
             var symbol = new Regex(@"^(print|if|then|else|\(|\))");
@@ -22,7 +22,7 @@ namespace TCompiler
             Match match;
             while (str.Length != 0)
             {
-                if ((match = space.Match(str)).Success) ;
+                if ((match = skip.Match(str)).Success) ;
                 else if ((match = comment.Match(str)).Success) ;
                 else if ((match = num.Match(str)).Success)
                     tokenlist.Add(new Token(match.Value, TokenType.Num));

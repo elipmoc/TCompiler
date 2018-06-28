@@ -71,8 +71,26 @@ namespace TCompiler
 
         Result<Expression, string> TopLevelBlockParser()
         {
-            return TopLevelParser().Bind(expr => OkParseResult(Expression.Block(vt.GetNowNestParamList(), expr)));
+            return TopLevelListParser().Bind(exprList => OkParseResult(Expression.Block(vt.GetNowNestParamList(), exprList)));
         }
+
+        Result<List<Expression>, string> TopLevelListParser()
+        {
+            return TopLevelParser().Bind(expr =>
+            {
+                var list = new List<Expression>();
+                list.Add(expr);
+                if (ts.Size <= ts.NowIndex)
+                    return Result<List<Expression>, string>.Ok(list);
+                return TopLevelListParser().Bind(exprList =>
+                {
+                    list.AddRange(exprList);
+                    return Result<List<Expression>, string>.Ok(list);
+                });
+
+            });
+        }
+
 
         Result<Expression,string> TopLevelParser()
         {

@@ -30,12 +30,15 @@ namespace TCompiler
                 case "-run":
                     {
                         Lexser.Lexicalanalysis(new StreamReader(args[1]).ReadToEnd())
-                            .Bind(tokenStream=> {
-                                new Parser(tokenStream).Parse().VoidMatch(
-                                    (action) => { action(); },
-                                    (errmsg) => { Console.WriteLine(errmsg); }
-                                    );
-                                return Result<int, string>.Ok(0);
+                            .Bind(tokenStream=> 
+                                new Parser(tokenStream).Parse().Bind(action=> {
+                                    action();
+                                    return Result<int, string>.Ok(0);
+                                })
+                            ).ErrBind(errmsg =>
+                            {
+                                Console.WriteLine(errmsg);
+                                return Result<int, string>.Err(errmsg);
                             });
                     }
                     break;
@@ -67,22 +70,22 @@ namespace TCompiler
                                var typeBuilder = moduleBuilder.DefineType("Program", TypeAttributes.Class);
                                var methodBuilder = typeBuilder.DefineMethod("Main", MethodAttributes.Static);
                                methodBuilder.SetParameters(typeof(string[]));
-                               new Parser(tokenStream).Parse(methodBuilder).VoidMatch(
-                                   (_) => {
+                               return new Parser(tokenStream).Parse(methodBuilder).Bind(
+                                   _ =>
+                                   {
                                        typeBuilder.CreateType();
                                        assemblyBuilder.SetEntryPoint(methodBuilder);
-                                       assemblyBuilder.Save(args[2]+".exe");
-                                       if(File.Exists(args[3] + "\\" + args[2] + ".exe")) File.Delete(args[3] + "\\" + args[2] + ".exe");
-                                       File.Move(args[2] + ".exe", args[3]+"\\"+args[2]+".exe");
-                                       var tcEXE=Assembly.GetExecutingAssembly().Location;
+                                       assemblyBuilder.Save(args[2] + ".exe");
+                                       if (File.Exists(args[3] + "\\" + args[2] + ".exe")) File.Delete(args[3] + "\\" + args[2] + ".exe");
+                                       File.Move(args[2] + ".exe", args[3] + "\\" + args[2] + ".exe");
+                                       var tcEXE = Assembly.GetExecutingAssembly().Location;
                                        if (File.Exists(args[3] + "\\tc.exe")) File.Delete(args[3] + "\\tc.exe");
                                        File.Copy(tcEXE, args[3] + "\\tc.exe");
                                        Console.WriteLine("build:" + args[3]);
-                                   },
-                                   (errmsg) => { Console.WriteLine(errmsg); }
-                                   );
+                                       return Result<int, string>.Ok(0);
+                                   });
                                return Result<int, string>.Ok(0);
-                           });
+                           }).ErrBind(errmsg => { Console.WriteLine(errmsg); return Result<int, string>.Err(errmsg); });
                     break;
                 default:
                     Console.WriteLine("ha?");

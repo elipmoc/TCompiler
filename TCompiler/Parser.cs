@@ -139,7 +139,7 @@ namespace TCompiler
             return ts.Get("error:label?")
              .Bind(TokenStrEqual("@", "error:label?"))
              .Bind(token => ts.Next("error:label?"))
-             .Bind(TokenTypeEqual(TokenType.Id,"@の後に識別子がありません"))
+             .Bind(TokenTypeEqual(TokenType.Id,"error:@の後に識別子がありません"))
              .Bind(token =>
              {
                  ts.Next("eof");
@@ -155,7 +155,7 @@ namespace TCompiler
             return ts.Get("error:goto?")
              .Bind(TokenStrEqual("goto", "error:goto?"))
              .Bind(token => ts.Next("error:goto?"))
-             .Bind(TokenTypeEqual(TokenType.Id, "gotoの後に識別子がありません"))
+             .Bind(TokenTypeEqual(TokenType.Id, "error:gotoの後に識別子がありません"))
              .Bind(token =>
              {
                  ts.Next("eof");
@@ -181,9 +181,9 @@ namespace TCompiler
                         .Bind(TokenStrEqual("==", "error:==?"))
                         .okFlag
                     ) ?
-                        ts.Next("==の後に式がありません")
+                        ts.Next("error:==の後に式がありません")
                         .Bind(_ => MinusOpParser())
-                        .ErrBind(_ => ErrParseResult("==の後に式がありません"))
+                        .ErrBind(_ => ErrParseResult("error:==の後に式がありません"))
                         .Bind(expr2 => {
                             return EqualOpParser2( Expression.Condition(Expression.Equal(expr1, expr2),Expression.Constant(1),Expression.Constant(0)));
                         })
@@ -208,9 +208,9 @@ namespace TCompiler
                         .Bind(TokenStrEqual("-", "error:-?"))
                         .okFlag
                     ) ?
-                        ts.Next("-の後に式がありません")
+                        ts.Next("error:-の後に式がありません")
                         .Bind(_ => AddOpParser())
-                        .ErrBind(_ => ErrParseResult("-の後に式がありません"))
+                        .ErrBind(_ => ErrParseResult("error:-の後に式がありません"))
                         .Bind(expr2 => {
                             return MinusOpParser2(Expression.Add(expr1,Expression.Negate(expr2)));
                         })
@@ -235,9 +235,9 @@ namespace TCompiler
                         .Bind(TokenStrEqual("+", "error:+?"))
                         .okFlag
                     ) ?
-                        ts.Next("+の後に式がありません")
+                        ts.Next("error:+の後に式がありません")
                         .Bind(_ => MulOpParser())
-                        .ErrBind(_ => ErrParseResult("+の後に式がありません"))
+                        .ErrBind(_ => ErrParseResult("error:+の後に式がありません"))
                         .Bind(expr2 => {
                             return AddOpParser2(Expression.Add(expr1, expr2));
                         })
@@ -262,9 +262,9 @@ namespace TCompiler
                         .Bind(TokenStrEqual("*", "error:*?"))
                         .okFlag
                     ) ?
-                        ts.Next("*の後に式がありません")
+                        ts.Next("error:*の後に式がありません")
                         .Bind(_ => DivOpParser())
-                        .ErrBind(_ => ErrParseResult("*の後に式がありません"))
+                        .ErrBind(_ => ErrParseResult("error:*の後に式がありません"))
                         .Bind(expr2 => {
                             return MulOpParser2(Expression.Multiply(expr1, expr2));
                         })
@@ -289,9 +289,9 @@ namespace TCompiler
                         .Bind(TokenStrEqual("/", "error:/?"))
                         .okFlag
                     ) ?
-                        ts.Next("/の後に式がありません")
+                        ts.Next("error:/の後に式がありません")
                         .Bind(_ => TermParser())
-                        .ErrBind(_ => ErrParseResult("/の後に式がありません"))
+                        .ErrBind(_ => ErrParseResult("error:/の後に式がありません"))
                         .Bind(expr2 => {
                             return DivOpParser2(Expression.Divide(expr1, expr2));
                         })
@@ -340,12 +340,12 @@ namespace TCompiler
              .Bind(token => ts.Next("eof"))
              .Bind(_ => TopLevelParser())
              .Bind(conExpr =>
-                ts.Get("ifの後にthenがありません").Bind(TokenStrEqual("then", "ifの後にthenがありません"))
-                .Bind(_ => ts.Next("thenの後に式がありません"))
+                ts.Get("error:ifの後にthenがありません").Bind(TokenStrEqual("then", "error:ifの後にthenがありません"))
+                .Bind(_ => ts.Next("error:thenの後に式がありません"))
                 .Bind(_ => TopLevelParser())
                 .Bind(trueExpr =>
-                    ts.Get("elseがありません").Bind(TokenStrEqual("else", "elseがありません"))
-                    .Bind(_ => ts.Next("elseの後に式がありません"))
+                    ts.Get("error:elseがありません").Bind(TokenStrEqual("else", "error:elseがありません"))
+                    .Bind(_ => ts.Next("error:elseの後に式がありません"))
                     .Bind(_ => TopLevelParser())
                     .Bind(falseExpr =>
                        OkParseResult(Expression.Condition(Expression.NotEqual(conExpr, Expression.Constant(0)), trueExpr, falseExpr))

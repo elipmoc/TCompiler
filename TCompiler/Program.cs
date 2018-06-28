@@ -84,7 +84,6 @@ namespace TCompiler
                                        Console.WriteLine("build:" + args[3]);
                                        return Result<int, string>.Ok(0);
                                    });
-                               return Result<int, string>.Ok(0);
                            }).ErrBind(errmsg => { Console.WriteLine(errmsg); return Result<int, string>.Err(errmsg); });
                     break;
                 default:

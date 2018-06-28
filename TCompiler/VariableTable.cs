@@ -54,6 +54,8 @@ namespace TCompiler
 
         public void Register(string name, ParameterExpression parameter)
         {
+            if (table[nest].ContainsKey(name) == true)
+                return;
             table[nest][name] = parameter;
         }
     }

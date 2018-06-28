@@ -1,4 +1,7 @@
-﻿topLevel := <assignOp>
+﻿topLevelList := <topLevel>+
+topLevel := <assignOp> | <goto> | <label>
+goto := 'goto' <id>
+label := '@' <id>
 assignOp := <id> '=' <topLevel> | <equalOp>
 equalOp := <addOp> {'==' <addOp>}
 addOp := <addOp> {('+'|'-') <addOp>}

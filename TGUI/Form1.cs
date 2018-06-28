@@ -13,6 +13,9 @@ namespace TGUI
 {
     public partial class Form1 : Form
     {
+        string projectPath = "";
+
+        const string formTitle = "Micsosoft Visual Stdio";
         public Form1()
         {
             InitializeComponent();
@@ -37,8 +40,25 @@ namespace TGUI
 
         private void 新規プロジェクト作成ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            folderBrowserDialog.ShowDialog();
-//            folderBrowserDialog.
+            var npf = new NewProjectForm();
+            if (npf.ShowDialog() == DialogResult.OK) {
+                this.Text = npf.projectName + " - " + formTitle;
+                projectPath= npf.pathName + "\\" + npf.projectName;
+                System.IO.Directory.CreateDirectory(projectPath);
+                System.IO.File.Create(projectPath + "\\source.txt").Close();
+                fileNameLabel.Text = "source.txt";
+            };
+        }
+
+        private void ファイル保存ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var bytes=System.Text.Encoding.UTF8.GetBytes(editTextBox.Text);
+            var file=System.IO.File.OpenWrite(projectPath + "\\source.txt");
+
+            using (file)
+            {
+                file.Write(bytes, 0, bytes.Length);
+            }
         }
     }
 }

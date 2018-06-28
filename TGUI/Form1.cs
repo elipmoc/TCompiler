@@ -34,13 +34,28 @@ namespace TGUI
         {
             var npf = new NewProjectForm();
             if (npf.ShowDialog() == DialogResult.OK) {
-                this.Text = npf.projectName + " - " + formTitle;
-                projectPath= npf.pathName + "\\" + npf.projectName;
-                projectName = npf.projectName;
                 System.IO.Directory.CreateDirectory(projectPath);
                 System.IO.File.Create(projectPath + "\\source.txt").Close();
-                fileNameLabel.Text = "source.txt";
+                setProject(npf.projectName, npf.pathName+"\\"+npf.projectName);
             };
+        }
+
+        private void プロジェクトを開くToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (folderBrowserDialog1.ShowDialog() == DialogResult.OK) {
+                setProject(System.IO.Path.GetFileName(folderBrowserDialog1.SelectedPath), folderBrowserDialog1.SelectedPath);
+            }
+        }
+
+        private void setProject(string projectName,string projectPath)
+        {
+            this.Text = projectName + " - " + formTitle;
+            this.projectPath = projectPath;
+            this.projectName = projectName;
+            fileNameLabel.Text = "source.txt";
+            var file = System.IO.File.OpenText(projectPath + "\\source.txt");
+            using (file)
+                editTextBox.Text = file.ReadToEnd();
         }
 
         private void ファイル保存ToolStripMenuItem_Click(object sender, EventArgs e)
@@ -54,9 +69,7 @@ namespace TGUI
             var file = new System.IO.StreamWriter(projectPath + "\\source.txt");
 
             using (file)
-            {
                 file.Write(editTextBox.Text.ToArray());
-            }
         }
 
         private void buildButton_Click(object sender, EventArgs e)
@@ -70,5 +83,7 @@ namespace TGUI
             fileSave();
             textBox1.Text = tcc.Run(projectPath + "\\source.txt");
         }
+
+
     }
 }

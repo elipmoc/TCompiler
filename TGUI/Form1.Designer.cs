@@ -40,6 +40,7 @@
             this.runButton = new System.Windows.Forms.ToolStripButton();
             this.editTextBox = new System.Windows.Forms.TextBox();
             this.fileNameLabel = new System.Windows.Forms.Label();
+            this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.menuStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -107,8 +108,9 @@
             this.プロジェクトを開くToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(44)))), ((int)(((byte)(44)))));
             this.プロジェクトを開くToolStripMenuItem.ForeColor = System.Drawing.SystemColors.Info;
             this.プロジェクトを開くToolStripMenuItem.Name = "プロジェクトを開くToolStripMenuItem";
-            this.プロジェクトを開くToolStripMenuItem.Size = new System.Drawing.Size(174, 22);
+            this.プロジェクトを開くToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.プロジェクトを開くToolStripMenuItem.Text = "プロジェクトを開く";
+            this.プロジェクトを開くToolStripMenuItem.Click += new System.EventHandler(this.プロジェクトを開くToolStripMenuItem_Click);
             // 
             // ファイル保存ToolStripMenuItem
             // 
@@ -216,6 +218,7 @@
         private System.Windows.Forms.TextBox editTextBox;
         private System.Windows.Forms.ToolStripMenuItem ファイル保存ToolStripMenuItem;
         private System.Windows.Forms.Label fileNameLabel;
+        private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
     }
 }
 

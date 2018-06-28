@@ -65,6 +65,7 @@ namespace TGUI
 
         private void fileSave()
         {
+            if (projectName == "") return;
             var bytes = System.Text.Encoding.UTF8.GetBytes(editTextBox.Text);
             var file = new System.IO.StreamWriter(projectPath + "\\source.txt");
 
@@ -74,12 +75,14 @@ namespace TGUI
 
         private void buildButton_Click(object sender, EventArgs e)
         {
+            if (projectName == "") return;
             fileSave();
             textBox1.Text=tcc.Build(projectPath + "\\source.txt",projectName ,projectPath);
         }
 
         private void runButton_Click(object sender, EventArgs e)
         {
+            if (projectName == "") return;
             fileSave();
             textBox1.Text=tcc.Build(projectPath + "\\source.txt",projectName ,projectPath);
             tcc.Run(projectPath + "\\source.txt");

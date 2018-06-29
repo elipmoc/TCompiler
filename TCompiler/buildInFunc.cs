@@ -13,5 +13,14 @@ namespace TCompiler
             Console.WriteLine(x);
             return x;
         }
+
+        public static int Scan()
+        {
+            int result;
+            while (int.TryParse(Console.ReadLine(), out result)==false) {
+
+            }
+            return result;
+        }
     }
 }

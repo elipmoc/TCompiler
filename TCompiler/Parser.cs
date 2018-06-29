@@ -304,6 +304,7 @@ namespace TCompiler
         {
             return
                 PrintParser()
+                .ErrBind(e=>ScanParser())
                 .ErrBind(e=>NumParser())
                 .ErrBind(e=>IdParser())
                 .ErrBind(e=>IfParser());
@@ -326,6 +327,26 @@ namespace TCompiler
                     {
                         ts.Next("eof");
                         return OkParseResult(Expression.Call(typeof(buildInFunc).GetMethod("Print"), expr));
+                    })
+                )
+            ).ErrBind(Rollback<Expression>(checkPoint));
+        }
+
+        Result<Expression, string> ScanParser()
+        {
+            var checkPoint = ts.NowIndex;
+            return ts.Get("error:scan?")
+            .Bind(TokenStrEqual("scan", "error:scan?"))
+            .Bind(_ =>
+                ts.Next("error:scanに(がありません")
+                .Bind(TokenStrEqual("(", "error:scanに(がありません"))
+                .Bind(__ =>
+                    ts.Next("error:scanに)がありません")
+                    .Bind(TokenStrEqual(")", "error:scanに)がありません"))
+                    .Bind(___ =>
+                    {
+                        ts.Next("eof");
+                        return OkParseResult(Expression.Call(typeof(buildInFunc).GetMethod("Scan")));
                     })
                 )
             ).ErrBind(Rollback<Expression>(checkPoint));

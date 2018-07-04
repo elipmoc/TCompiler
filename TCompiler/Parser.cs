@@ -13,10 +13,16 @@ namespace TCompiler
         TokenStream ts;
         VariableTable vt= new VariableTable();
         LabelTable lt = new LabelTable();
+        List<OpData> opList = new List<OpData>();
 
         public Parser(TokenStream ts)
         {
             this.ts = ts;
+            opList.Add(new OpData("==", (expr1,expr2)=>Expression.Condition(Expression.Equal(expr1, expr2), Expression.Constant(1), Expression.Constant(0))));
+            opList.Add(new OpData("-", (expr1,expr2)=>Expression.Add(expr1, Expression.Negate(expr2))));
+            opList.Add(new OpData("+", (expr1, expr2) => Expression.Add(expr1, expr2)));
+            opList.Add(new OpData("*", (expr1, expr2) => Expression.Multiply(expr1, expr2)));
+            opList.Add(new OpData("/", (expr1, expr2) => Expression.Divide(expr1, expr2)));
         }
 
 
@@ -122,13 +128,13 @@ namespace TCompiler
                                 _=> 
                                 {
                                     ts.Prev();
-                                    return EqualOpParser();
+                                    return OpParser();
                                 }
 
                             )
                             
                          ),
-                    _=> EqualOpParser()
+                    _=> OpParser()
                 ).ErrBind(Rollback<Expression>(checkPoint));
         }
 
@@ -163,137 +169,35 @@ namespace TCompiler
              }
              ).ErrBind(Rollback<Expression>(checkPoint));
         }
-
-
-        Result<Expression, string> EqualOpParser()
+        
+        Result<Expression,string> OpParser(int index=-1)
         {
-            return MinusOpParser().Bind(expr => EqualOpParser2(expr));
+            index++;
+            if (opList.Count()>index)
+            {
+                return OpParser(index).Bind(expr => OpParser2(index,opList[index], expr));
+            }else
+            {
+                return TermParser();
+            }
         }
 
-        Result<Expression, string> EqualOpParser2(Expression expr1)
+        Result<Expression, string> OpParser2(int index,OpData opData,Expression expr1)
         {
             var checkPoint = ts.NowIndex;
 
             return
                 (
                     (
-                       ts.Get("error:==?")
-                        .Bind(TokenStrEqual("==", "error:==?"))
+                       ts.Get($"error:{opData.Op}?")
+                        .Bind(TokenStrEqual(opData.Op, $"error:{opData.Op}?"))
                         .okFlag
                     ) ?
-                        ts.Next("error:==の後に式がありません")
-                        .Bind(_ => MinusOpParser())
-                        .ErrBind(_ => ErrParseResult("error:==の後に式がありません"))
+                        ts.Next($"error:{opData.Op}の後に式がありません")
+                        .Bind(_ => OpParser(index))
+                        .ErrBind(_ => ErrParseResult($"error:{opData.Op}の後に式がありません"))
                         .Bind(expr2 => {
-                            return EqualOpParser2( Expression.Condition(Expression.Equal(expr1, expr2),Expression.Constant(1),Expression.Constant(0)));
-                        })
-                    :
-                        OkParseResult(expr1)
-                ).ErrBind(Rollback<Expression>(checkPoint));
-        }
-
-        Result<Expression, string> MinusOpParser()
-        {
-            return AddOpParser().Bind(expr => MinusOpParser2(expr));
-        }
-
-        Result<Expression, string> MinusOpParser2(Expression expr1)
-        {
-            var checkPoint = ts.NowIndex;
-
-            return
-                (
-                    (
-                       ts.Get("error:-?")
-                        .Bind(TokenStrEqual("-", "error:-?"))
-                        .okFlag
-                    ) ?
-                        ts.Next("error:-の後に式がありません")
-                        .Bind(_ => AddOpParser())
-                        .ErrBind(_ => ErrParseResult("error:-の後に式がありません"))
-                        .Bind(expr2 => {
-                            return MinusOpParser2(Expression.Add(expr1,Expression.Negate(expr2)));
-                        })
-                    :
-                        OkParseResult(expr1)
-                ).ErrBind(Rollback<Expression>(checkPoint));
-        }
-
-        Result<Expression, string> AddOpParser()
-        {
-            return MulOpParser().Bind(expr => AddOpParser2(expr));
-        }
-
-        Result<Expression, string> AddOpParser2(Expression expr1)
-        {
-            var checkPoint = ts.NowIndex;
-
-            return
-                (
-                    (
-                       ts.Get("error:+?")
-                        .Bind(TokenStrEqual("+", "error:+?"))
-                        .okFlag
-                    ) ?
-                        ts.Next("error:+の後に式がありません")
-                        .Bind(_ => MulOpParser())
-                        .ErrBind(_ => ErrParseResult("error:+の後に式がありません"))
-                        .Bind(expr2 => {
-                            return AddOpParser2(Expression.Add(expr1, expr2));
-                        })
-                    :
-                        OkParseResult(expr1)
-                ).ErrBind(Rollback<Expression>(checkPoint));
-        }
-
-        Result<Expression, string> MulOpParser()
-        {
-            return DivOpParser().Bind(expr => MulOpParser2(expr));
-        }
-
-        Result<Expression, string> MulOpParser2(Expression expr1)
-        {
-            var checkPoint = ts.NowIndex;
-
-            return
-                (
-                    (
-                       ts.Get("error:*?")
-                        .Bind(TokenStrEqual("*", "error:*?"))
-                        .okFlag
-                    ) ?
-                        ts.Next("error:*の後に式がありません")
-                        .Bind(_ => DivOpParser())
-                        .ErrBind(_ => ErrParseResult("error:*の後に式がありません"))
-                        .Bind(expr2 => {
-                            return MulOpParser2(Expression.Multiply(expr1, expr2));
-                        })
-                    :
-                        OkParseResult(expr1)
-                ).ErrBind(Rollback<Expression>(checkPoint));
-        }
-
-        Result<Expression,string> DivOpParser()
-        {
-            return TermParser().Bind(expr => DivOpParser2(expr));
-        }
-
-        Result<Expression, string> DivOpParser2(Expression expr1)
-        {
-            var checkPoint = ts.NowIndex;
-
-            return
-                (
-                    (
-                       ts.Get("error:/?")
-                        .Bind(TokenStrEqual("/", "error:/?"))
-                        .okFlag
-                    ) ?
-                        ts.Next("error:/の後に式がありません")
-                        .Bind(_ => TermParser())
-                        .ErrBind(_ => ErrParseResult("error:/の後に式がありません"))
-                        .Bind(expr2 => {
-                            return DivOpParser2(Expression.Divide(expr1, expr2));
+                            return OpParser2(index,opData,opData.OpMake(expr1,expr2));
                         })
                     :
                         OkParseResult(expr1)

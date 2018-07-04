@@ -34,8 +34,6 @@ namespace TGUI
         {
             var npf = new NewProjectForm();
             if (npf.ShowDialog() == DialogResult.OK) {
-                System.IO.Directory.CreateDirectory(projectPath);
-                System.IO.File.Create(projectPath + "\\source.txt").Close();
                 setProject(npf.projectName, npf.pathName+"\\"+npf.projectName);
             };
         }
@@ -53,6 +51,10 @@ namespace TGUI
             this.projectPath = projectPath;
             this.projectName = projectName;
             fileNameLabel.Text = "source.txt";
+            if(System.IO.Directory.Exists(projectPath)==false)
+                System.IO.Directory.CreateDirectory(projectPath);
+            if (System.IO.File.Exists(projectPath + "\\source.txt")==false)
+                System.IO.File.Create(projectPath + "\\source.txt").Close();
             var file = System.IO.File.OpenText(projectPath + "\\source.txt");
             using (file)
                 editTextBox.Text = file.ReadToEnd();

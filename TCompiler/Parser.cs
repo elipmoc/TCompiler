@@ -15,10 +15,23 @@ namespace TCompiler
         LabelTable lt = new LabelTable();
         List<OpData> opList = new List<OpData>();
 
+
+        private Expression NumberToBool(Expression expr)
+        {
+            return Expression.Condition(Expression.Equal(expr, Expression.Constant(0)), Expression.Constant(false), Expression.Constant(true));
+        }
+
+        private Expression BoolToNumber(Expression expr)
+        {
+            return Expression.Condition(expr, Expression.Constant(1), Expression.Constant(0));
+        }
+
         public Parser(TokenStream ts)
         {
             this.ts = ts;
-            opList.Add(new OpData("==", (expr1,expr2)=>Expression.Condition(Expression.Equal(expr1, expr2), Expression.Constant(1), Expression.Constant(0))));
+            opList.Add(new OpData("||", (expr1,expr2)=>BoolToNumber(Expression.OrElse(NumberToBool(expr1), NumberToBool(expr2))) ));
+            opList.Add(new OpData("&&", (expr1,expr2)=>BoolToNumber(Expression.AndAlso(NumberToBool(expr1),NumberToBool(expr2))) ));
+            opList.Add(new OpData("==", (expr1,expr2)=>BoolToNumber(Expression.Equal(expr1, expr2)) ));
             opList.Add(new OpData("-", (expr1,expr2)=>Expression.Add(expr1, Expression.Negate(expr2))));
             opList.Add(new OpData("+", (expr1, expr2) => Expression.Add(expr1, expr2)));
             opList.Add(new OpData("*", (expr1, expr2) => Expression.Multiply(expr1, expr2)));

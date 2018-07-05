@@ -35,8 +35,10 @@ namespace TCompiler
                 ));
             opListList.Add(new OpDataList(new OpData("&&", (expr1,expr2)=>BoolToNumber(Expression.AndAlso(NumberToBool(expr1),NumberToBool(expr2))) )));
             opListList.Add(new OpDataList(new OpData("==", (expr1,expr2)=>BoolToNumber(Expression.Equal(expr1, expr2)) )));
-            opListList.Add(new OpDataList(new OpData("-", (expr1,expr2)=>Expression.Add(expr1, Expression.Negate(expr2)))));
-            opListList.Add(new OpDataList(new OpData("+", (expr1, expr2) => Expression.Add(expr1, expr2))));
+            opListList.Add(new OpDataList(
+                new OpData("+", (expr1, expr2) => Expression.Add(expr1, expr2)),
+                new OpData("-", (expr1, expr2) => Expression.Add(expr1, Expression.Negate(expr2)))
+            ));
             opListList.Add(new OpDataList(new OpData("*", (expr1, expr2) => Expression.Multiply(expr1, expr2))));
             opListList.Add(new OpDataList(new OpData("/", (expr1, expr2) => Expression.Divide(expr1, expr2))));
         }

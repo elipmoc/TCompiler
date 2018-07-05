@@ -18,7 +18,7 @@ namespace TCompiler
             var num = new Regex(@"^\d+");
             var identifier = new Regex(@"^[a-z]+");
             var symbol = new Regex(@"^(print|goto|@|if|then|else|\(|\))");
-            var op = new Regex(@"^(\+|-|/|\*|==|<=|>=|!=|<|>|%|&&|\|\||=)");
+            var op = new Regex(@"^(\+|-|/|\*|==|<=|>=|!=|<<|>>|<|>|%|&&|\|\||=|&|\||\^)");
             Match match;
             while (str.Length != 0)
             {

@@ -34,12 +34,31 @@ namespace TCompiler
                     new OpData("||", (expr1,expr2)=>BoolToNumber(Expression.OrElse(NumberToBool(expr1), NumberToBool(expr2))))
                 ));
             opListList.Add(new OpDataList(new OpData("&&", (expr1,expr2)=>BoolToNumber(Expression.AndAlso(NumberToBool(expr1),NumberToBool(expr2))) )));
-            opListList.Add(new OpDataList(new OpData("==", (expr1,expr2)=>BoolToNumber(Expression.Equal(expr1, expr2)) )));
+            opListList.Add(new OpDataList(new OpData("|", (expr1, expr2) => Expression.And(expr1, expr2))));
+            opListList.Add(new OpDataList(new OpData("^", (expr1, expr2) => Expression.ExclusiveOr(expr1, expr2))));
+            opListList.Add(new OpDataList(new OpData("|", (expr1, expr2) => Expression.Or(expr1, expr2))));
+            opListList.Add(new OpDataList(
+                new OpData("==", (expr1,expr2)=>BoolToNumber(Expression.Equal(expr1, expr2)) ),
+                new OpData("!=", (expr1, expr2)=>BoolToNumber(Expression.NotEqual(expr1, expr2)) )
+            ));
+            opListList.Add(new OpDataList(
+                new OpData("<", (expr1, expr2) => BoolToNumber(Expression.LessThan(expr1, expr2))),
+                new OpData(">", (expr1, expr2) => BoolToNumber(Expression.GreaterThan(expr1, expr2))),
+                new OpData("<=", (expr1, expr2) => BoolToNumber(Expression.LessThanOrEqual(expr1, expr2))),
+                new OpData(">=", (expr1, expr2) => BoolToNumber(Expression.GreaterThanOrEqual(expr1, expr2)))
+            ));
+            opListList.Add(new OpDataList(
+                new OpData("<<", (expr1, expr2) => Expression.LeftShift(expr1, expr2)),
+                new OpData(">>", (expr1, expr2) => Expression.RightShift(expr1, expr2))
+            ));
             opListList.Add(new OpDataList(
                 new OpData("+", (expr1, expr2) => Expression.Add(expr1, expr2)),
                 new OpData("-", (expr1, expr2) => Expression.Add(expr1, Expression.Negate(expr2)))
             ));
-            opListList.Add(new OpDataList(new OpData("*", (expr1, expr2) => Expression.Multiply(expr1, expr2))));
+            opListList.Add(new OpDataList(
+                new OpData("*", (expr1, expr2) => Expression.Multiply(expr1, expr2)),
+                new OpData("%", (expr1, expr2) => Expression.Modulo(expr1, expr2))
+            ));
             opListList.Add(new OpDataList(new OpData("/", (expr1, expr2) => Expression.Divide(expr1, expr2))));
         }
 

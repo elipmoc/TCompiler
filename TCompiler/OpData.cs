@@ -9,14 +9,38 @@ namespace TCompiler
 {
     using OpFunc = Func<Expression, Expression, Expression>;
 
+    class OpDataList
+    {
+        public string[] OpList
+        {
+            get
+            {
+               return opDataList.Select(x => x.Op).ToArray();
+            }
+        }
+
+        private List<OpData> opDataList;
+
+        public Expression OpMake(string op,Expression expr1,Expression expr2)
+        {
+            return opDataList.Find(x => x.Op == op).OpMake(expr1, expr2);
+        }
+
+        public OpDataList(params OpData[] opDataList)
+        {
+            this.opDataList = opDataList.ToList();
+        }
+
+    }
+
     class OpData
     {
-        public string Op { get; private set; }
-        public OpFunc OpMake { get; private set; }
-        public OpData(string op,OpFunc opMake)
+        public readonly string Op; 
+        public readonly OpFunc OpMake;
+        public OpData(string op,OpFunc opFunc)
         {
-            Op = op;
-            OpMake = opMake;
+            this.Op = op;
+            this.OpMake= opFunc;
         }
     }
 }

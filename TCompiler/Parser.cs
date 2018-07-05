@@ -13,7 +13,7 @@ namespace TCompiler
         TokenStream ts;
         VariableTable vt= new VariableTable();
         LabelTable lt = new LabelTable();
-        List<OpData> opList = new List<OpData>();
+        List<OpDataList> opListList = new List<OpDataList>();
 
 
         private Expression NumberToBool(Expression expr)
@@ -29,13 +29,16 @@ namespace TCompiler
         public Parser(TokenStream ts)
         {
             this.ts = ts;
-            opList.Add(new OpData("||", (expr1,expr2)=>BoolToNumber(Expression.OrElse(NumberToBool(expr1), NumberToBool(expr2))) ));
-            opList.Add(new OpData("&&", (expr1,expr2)=>BoolToNumber(Expression.AndAlso(NumberToBool(expr1),NumberToBool(expr2))) ));
-            opList.Add(new OpData("==", (expr1,expr2)=>BoolToNumber(Expression.Equal(expr1, expr2)) ));
-            opList.Add(new OpData("-", (expr1,expr2)=>Expression.Add(expr1, Expression.Negate(expr2))));
-            opList.Add(new OpData("+", (expr1, expr2) => Expression.Add(expr1, expr2)));
-            opList.Add(new OpData("*", (expr1, expr2) => Expression.Multiply(expr1, expr2)));
-            opList.Add(new OpData("/", (expr1, expr2) => Expression.Divide(expr1, expr2)));
+            opListList.Add(
+                new OpDataList(
+                    new OpData("||", (expr1,expr2)=>BoolToNumber(Expression.OrElse(NumberToBool(expr1), NumberToBool(expr2))))
+                ));
+            opListList.Add(new OpDataList(new OpData("&&", (expr1,expr2)=>BoolToNumber(Expression.AndAlso(NumberToBool(expr1),NumberToBool(expr2))) )));
+            opListList.Add(new OpDataList(new OpData("==", (expr1,expr2)=>BoolToNumber(Expression.Equal(expr1, expr2)) )));
+            opListList.Add(new OpDataList(new OpData("-", (expr1,expr2)=>Expression.Add(expr1, Expression.Negate(expr2)))));
+            opListList.Add(new OpDataList(new OpData("+", (expr1, expr2) => Expression.Add(expr1, expr2))));
+            opListList.Add(new OpDataList(new OpData("*", (expr1, expr2) => Expression.Multiply(expr1, expr2))));
+            opListList.Add(new OpDataList(new OpData("/", (expr1, expr2) => Expression.Divide(expr1, expr2))));
         }
 
 
@@ -55,6 +58,20 @@ namespace TCompiler
                   token.Str == str ?
                       Result<Token, string>.Ok(token) :
                       Result<Token, string>.Err(errMsg);
+        }
+
+        Result<Token, string>.BindFunc<Token> TokenStrEquals(string[] strList, string errMsg)
+        {
+            return (Token token) =>
+            {
+                foreach (var str in strList)
+                {
+                    if (token.Str == str)
+                        return Result<Token, string>.Ok(token);
+                }
+                return Result<Token, string>.Err(errMsg);
+
+            };
         }
 
         Result<Token, string>.BindFunc<Token> TokenTypeEqual(TokenType tt, string errMsg)
@@ -186,34 +203,33 @@ namespace TCompiler
         Result<Expression,string> OpParser(int index=-1)
         {
             index++;
-            if (opList.Count()>index)
+            if (opListList.Count()>index)
             {
-                return OpParser(index).Bind(expr => OpParser2(index,opList[index], expr));
+                return OpParser(index).Bind(expr => OpParser2(index,opListList[index], expr));
             }else
             {
                 return TermParser();
             }
         }
 
-        Result<Expression, string> OpParser2(int index,OpData opData,Expression expr1)
+        Result<Expression, string> OpParser2(int index,OpDataList opDataList,Expression expr1)
         {
             var checkPoint = ts.NowIndex;
 
             return
                 (
-                    (
-                       ts.Get($"error:{opData.Op}?")
-                        .Bind(TokenStrEqual(opData.Op, $"error:{opData.Op}?"))
-                        .okFlag
-                    ) ?
-                        ts.Next($"error:{opData.Op}の後に式がありません")
-                        .Bind(_ => OpParser(index))
-                        .ErrBind(_ => ErrParseResult($"error:{opData.Op}の後に式がありません"))
-                        .Bind(expr2 => {
-                            return OpParser2(index,opData,opData.OpMake(expr1,expr2));
-                        })
-                    :
-                        OkParseResult(expr1)
+                       ts.Get($"error:op?")
+                        .Bind(TokenStrEquals(opDataList.OpList, $"error:op?"))
+                        .Match(
+                           (token) => 
+                                ts.Next($"error:演算子の後に式がありません")
+                                .Bind(_ => OpParser(index))
+                                .ErrBind(_ => ErrParseResult($"error:演算子の後に式がありません"))
+                                .Bind(expr2 => 
+                                    OpParser2(index, opDataList, opDataList.OpMake(token.Str, expr1, expr2))
+                                ), 
+                           (err)=>OkParseResult(expr1)
+                         )
                 ).ErrBind(Rollback<Expression>(checkPoint));
         }
 

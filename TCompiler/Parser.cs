@@ -129,7 +129,14 @@ namespace TCompiler
 
         Result<Expression, string> TopLevelBlockParser()
         {
-            return TopLevelListParser().Bind(exprList => OkParseResult(Expression.Block(vt.GetNowNestParamList(), exprList)));
+            var endExpr1 = Expression.Call(typeof(Console).GetMethod("WriteLine", new Type[] { typeof(string) }), Expression.Constant("続行するには何かキーを押してください"));
+            var endExpr2 = Expression.Call(typeof(Console).GetMethod("ReadKey",new Type[] { }));
+            return TopLevelListParser().Bind(exprList => {
+                exprList.Add(endExpr1);
+                exprList.Add(endExpr2);
+                return OkParseResult(Expression.Block(vt.GetNowNestParamList(), exprList));
+                }
+            );
         }
 
         Result<List<Expression>, string> TopLevelListParser()

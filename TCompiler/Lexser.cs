@@ -13,7 +13,7 @@ namespace TCompiler
         static public Result<TokenStream,string> Lexicalanalysis(string str)
         {
             var tokenlist = new List<Token>();
-            var comment = new Regex(@"\/\*.*\*\/");
+            var comment = new Regex(@"\/\*(.|[ \t\n\r])*\*\/");
             var skip = new Regex(@"^[ \t\n\r]+");
             var num = new Regex(@"^\d+");
             var identifier = new Regex(@"^[a-z]+");

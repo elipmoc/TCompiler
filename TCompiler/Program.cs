@@ -48,7 +48,7 @@ namespace TCompiler
                 case "--version":
                 case "-version":
                 case "-Version":
-                    Console.WriteLine("TCompiler version 0.0.1");
+                    Console.WriteLine("TCompiler version 0.0.2");
                     break;
                 case "-h":
                     Console.WriteLine("コンパイル");

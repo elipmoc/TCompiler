@@ -268,7 +268,24 @@ namespace TCompiler
                 .ErrBind(e=>ScanParser())
                 .ErrBind(e=>NumParser())
                 .ErrBind(e=>IdParser())
-                .ErrBind(e=>IfParser());
+                .ErrBind(e=>IfParser())
+                .ErrBind(e=>ParenParser());
+        }
+
+        Result<Expression,string> ParenParser()
+        {
+            return
+                ts.Get("error:(?")
+                .Bind(TokenStrEqual("(", "error:(?"))
+                .Bind(_ => ts.Next("error:(の後に式がありません"))
+                .Bind(_ => TopLevelParser())
+                .Bind(expr =>
+                {
+                    return
+                        ts.Get("error: 式の後に)がありません")
+                        .Bind(TokenStrEqual(")", "error: (の後に)がありません"))
+                        .Bind(_ => { ts.Next(""); return OkParseResult(expr); });
+                });
         }
 
         Result<Expression,string> PrintParser()

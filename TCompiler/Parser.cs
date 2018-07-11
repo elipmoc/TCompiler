@@ -159,7 +159,10 @@ namespace TCompiler
 
         Result<Expression,string> TopLevelParser()
         {
-            return AssignOpParser().ErrBind(e=>LabelParser()).ErrBind(e=>GotoParser());
+            return 
+                AssignOpParser()
+                .ErrBind(e=>LabelParser().ErrBind(ee => ErrParseResult(e + ee)))
+                .ErrBind(e=>GotoParser().ErrBind(ee => ErrParseResult(e + ee)));
         }
 
         Result<Expression, string> AssignOpParser()
@@ -167,8 +170,8 @@ namespace TCompiler
             var checkPoint = ts.NowIndex;
 
             return
-                ts.Get("error:Assign?")
-                .Bind(TokenTypeEqual(TokenType.Id, "error:Assign?"))
+                ts.Get("")
+                .Bind(TokenTypeEqual(TokenType.Id, ""))
                 .Match<Result<Expression,string>>(
                     token =>
                         (
@@ -200,13 +203,13 @@ namespace TCompiler
         {
             var checkPoint = ts.NowIndex;
 
-            return ts.Get("error:label?")
-             .Bind(TokenStrEqual("@", "error:label?"))
-             .Bind(token => ts.Next("error:label?"))
+            return ts.Get("")
+             .Bind(TokenStrEqual("@", ""))
+             .Bind(token => ts.Next("error:@の後に識別子がありません"))
              .Bind(TokenTypeEqual(TokenType.Id,"error:@の後に識別子がありません"))
              .Bind(token =>
              {
-                 ts.Next("eof");
+                 ts.Next("");
                  return OkParseResult(Expression.Label(lt.Find(token.Str)));
              }
              ).ErrBind(Rollback<Expression>(checkPoint));
@@ -216,13 +219,13 @@ namespace TCompiler
         {
             var checkPoint = ts.NowIndex;
 
-            return ts.Get("error:goto?")
-             .Bind(TokenStrEqual("goto", "error:goto?"))
-             .Bind(token => ts.Next("error:goto?"))
+            return ts.Get("")
+             .Bind(TokenStrEqual("goto", ""))
+             .Bind(token => ts.Next("error:gotoの後に識別子がありません"))
              .Bind(TokenTypeEqual(TokenType.Id, "error:gotoの後に識別子がありません"))
              .Bind(token =>
              {
-                 ts.Next("eof");
+                 ts.Next("");
                  return OkParseResult(Expression.Block( Expression.Goto(lt.Find(token.Str)),Expression.Constant(1)));
              }
              ).ErrBind(Rollback<Expression>(checkPoint));
@@ -246,8 +249,8 @@ namespace TCompiler
 
             return
                 (
-                       ts.Get($"error:op?")
-                        .Bind(TokenStrEquals(opDataList.OpList, $"error:op?"))
+                       ts.Get("")
+                        .Bind(TokenStrEquals(opDataList.OpList, ""))
                         .Match(
                            (token) => 
                                 ts.Next($"error:演算子の後に式がありません")
@@ -265,18 +268,18 @@ namespace TCompiler
         {
             return
                 PrintParser()
-                .ErrBind(e=>ScanParser())
-                .ErrBind(e=>NumParser())
-                .ErrBind(e=>IdParser())
-                .ErrBind(e=>IfParser())
-                .ErrBind(e=>ParenParser());
+                .ErrBind(e=>ScanParser().ErrBind(ee=>ErrParseResult(e+ee)))
+                .ErrBind(e=>NumParser().ErrBind(ee => ErrParseResult(e + ee)))
+                .ErrBind(e=>IdParser().ErrBind(ee => ErrParseResult(e + ee)))
+                .ErrBind(e=>IfParser().ErrBind(ee => ErrParseResult(e + ee)))
+                .ErrBind(e=>ParenParser().ErrBind(ee => ErrParseResult(e + ee)));
         }
 
         Result<Expression,string> ParenParser()
         {
             return
-                ts.Get("error:(?")
-                .Bind(TokenStrEqual("(", "error:(?"))
+                ts.Get("")
+                .Bind(TokenStrEqual("(", ""))
                 .Bind(_ => ts.Next("error:(の後に式がありません"))
                 .Bind(_ => TopLevelParser())
                 .Bind(expr =>
@@ -291,8 +294,8 @@ namespace TCompiler
         Result<Expression,string> PrintParser()
         {
             var checkPoint = ts.NowIndex;
-            return ts.Get("error:print?")
-            .Bind(TokenStrEqual("print", "error:print?"))
+            return ts.Get("")
+            .Bind(TokenStrEqual("print", ""))
             .Bind(_ =>
                 ts.Next("error:printに(がありません")
                 .Bind(TokenStrEqual("(", "error:printに(がありません"))
@@ -303,7 +306,7 @@ namespace TCompiler
                     .Bind(TokenStrEqual(")", "error:printに)がありません"))
                     .Bind(___ =>
                     {
-                        ts.Next("eof");
+                        ts.Next("");
                         return OkParseResult(Expression.Call(typeof(buildInFunc).GetMethod("Print"), expr));
                     })
                 )
@@ -313,8 +316,8 @@ namespace TCompiler
         Result<Expression, string> ScanParser()
         {
             var checkPoint = ts.NowIndex;
-            return ts.Get("error:scan?")
-            .Bind(TokenStrEqual("scan", "error:scan?"))
+            return ts.Get("")
+            .Bind(TokenStrEqual("scan", ""))
             .Bind(_ =>
                 ts.Next("error:scanに(がありません")
                 .Bind(TokenStrEqual("(", "error:scanに(がありません"))
@@ -323,7 +326,7 @@ namespace TCompiler
                     .Bind(TokenStrEqual(")", "error:scanに)がありません"))
                     .Bind(___ =>
                     {
-                        ts.Next("eof");
+                        ts.Next("");
                         return OkParseResult(Expression.Call(typeof(buildInFunc).GetMethod("Scan")));
                     })
                 )
@@ -334,9 +337,9 @@ namespace TCompiler
         {
             var checkPoint = ts.NowIndex;
 
-            return ts.Get("error:If?")
-             .Bind(TokenStrEqual("if", "error:If?"))
-             .Bind(token => ts.Next("eof"))
+            return ts.Get("")
+             .Bind(TokenStrEqual("if", ""))
+             .Bind(token => ts.Next(""))
              .Bind(_ => TopLevelParser())
              .Bind(conExpr =>
                 ts.Get("error:ifの後にthenがありません").Bind(TokenStrEqual("then", "error:ifの後にthenがありません"))
@@ -355,22 +358,22 @@ namespace TCompiler
 
         Result<Expression,string> NumParser()
         {
-           return ts.Get("error:Num?")
-            .Bind(TokenTypeEqual(TokenType.Num, "error:Num?"))
+           return ts.Get("")
+            .Bind(TokenTypeEqual(TokenType.Num, ""))
             .Bind(token =>
             {
-                ts.Next("eof");
+                ts.Next("");
                 return OkParseResult(Expression.Constant(token.GetNum()));
             });
         }
 
         Result<Expression, string> IdParser()
         {
-            return ts.Get("error:Id?")
-             .Bind(TokenTypeEqual(TokenType.Id, "error:Id?"))
+            return ts.Get("")
+             .Bind(TokenTypeEqual(TokenType.Id, ""))
              .Bind(token =>
              {
-                 ts.Next("eof");
+                 ts.Next("");
                  return OkParseResult(vt.FindNowNest(token.Str));
              });
         }

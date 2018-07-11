@@ -50,7 +50,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="buildInFunc.cs" />
-    <Compile Include="GenericPlus.cs" />
     <Compile Include="LabelTable.cs" />
     <Compile Include="Lexser.cs" />
     <Compile Include="OpData.cs" />

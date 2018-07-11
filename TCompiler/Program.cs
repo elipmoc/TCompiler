@@ -73,15 +73,19 @@ namespace TCompiler
                                return new Parser(tokenStream).Parse(methodBuilder).Bind(
                                    _ =>
                                    {
+                                       var toPath = args.Length < 4 ? "" : args[3] + "\\";
                                        typeBuilder.CreateType();
                                        assemblyBuilder.SetEntryPoint(methodBuilder);
+                                       if (File.Exists(toPath + args[2] + ".exe")) File.Delete(toPath + args[2] + ".exe");
                                        assemblyBuilder.Save(args[2] + ".exe");
-                                       if (File.Exists(args[3] + "\\" + args[2] + ".exe")) File.Delete(args[3] + "\\" + args[2] + ".exe");
-                                       File.Move(args[2] + ".exe", args[3] + "\\" + args[2] + ".exe");
+                                       File.Move(args[2] + ".exe", toPath+ args[2] + ".exe");
                                        var tcEXE = Assembly.GetExecutingAssembly().Location;
-                                       if (File.Exists(args[3] + "\\tc.exe")) File.Delete(args[3] + "\\tc.exe");
-                                       File.Copy(tcEXE, args[3] + "\\tc.exe");
-                                       Console.WriteLine("build:" + args[3]);
+                                       if (toPath != "")
+                                       {
+                                           if (File.Exists(toPath + "tc.exe")) File.Delete(toPath + "tc.exe");
+                                           File.Copy(tcEXE, toPath + "tc.exe");
+                                       }
+                                       Console.WriteLine("build:" + toPath);
                                        return Result<int, string>.Ok(0);
                                    });
                            }).ErrBind(errmsg => { Console.WriteLine(errmsg); return Result<int, string>.Err(errmsg); });

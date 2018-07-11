@@ -53,6 +53,7 @@ namespace TCompiler
                 case "-h":
                     Console.WriteLine("コンパイル");
                     Console.WriteLine("tc -o <コンパイル対象のファイル名> <コンパイル後の名前>");
+                    Console.WriteLine("tc -o <コンパイル対象のファイル名> <コンパイル後の名前> <出力パス指定>");
                     Console.WriteLine();
                     Console.WriteLine("バージョン情報");
                     Console.WriteLine("tc -v or -V or --version or --Version -version -Version");

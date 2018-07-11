@@ -175,8 +175,8 @@ namespace TCompiler
                 .Match<Result<Expression,string>>(
                     token =>
                         (
-                            ts.Next("error:=がないのでは？")
-                            .Bind(TokenStrEqual("=", "error:=がないのでは？"))
+                            ts.Next("")
+                            .Bind(TokenStrEqual("=", ""))
                             .Bind(_ => ts.Next("error:=の右に式がありません"))
                             .Match<Result<Expression,string>>(
                                 _=>(
@@ -374,7 +374,13 @@ namespace TCompiler
              .Bind(token =>
              {
                  ts.Next("");
-                 return OkParseResult(vt.FindNowNest(token.Str));
+                 var v=vt.FindNowNest(token.Str);
+                 if (v == null)
+                 {
+                     vt.Register(token.Str, Expression.Parameter(Type.GetType("System.Int32"), token.Str));
+                     return OkParseResult(Expression.Assign(vt.FindNowNest(token.Str), Expression.Constant(0)));
+                 }
+                 return OkParseResult(v);
              });
         }
     }
